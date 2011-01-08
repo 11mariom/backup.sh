@@ -3,7 +3,7 @@
 # the backup script
 #===================
 #=== conf ===#
-exclude="--exclude /home/mario/.wine --exclude /home/mario/Torrents --exclude /home/mario/.games" # write --exclude <smth>       ### see rdiff-backup
+exclude="/home/mario/.wine /home/mario/Torrents /home/mario/.games" # write shell_pattern      ### see man rdiff-backup
 o_opt="--print-statistics" # other options to rdiff-backup  ## man pages
 b_dir="/home/" # directory to backup
 d_dir="/media/backup/" # destination of backup
@@ -42,6 +42,8 @@ else
     exit
 fi
 
+exclude=$(echo ${exclude} | awk '{for (i = 1; i <= NF; i++)\
+                               printf "--exclude %s ",$i}')
 echo "${r}Starting backup…${c}"
 rdiff-backup ${o_opt} ${exclude} ${b_dir} ${d_dir} >> ${l_file}
 exit_code=$?
