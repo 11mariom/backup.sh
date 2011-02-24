@@ -7,6 +7,7 @@ Dependencies:
 -------------
    * `rdiff-backup`
    * `posix-sh`
+   * `awk`
 
 Configuration:
 --------------
