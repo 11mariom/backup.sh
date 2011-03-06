@@ -66,19 +66,15 @@ while getopts "b:d:e:f:hlm::o:" opt; do
     case $opt in
 	b)
 	    b_dir="${OPTARG}"
-	    printf ${OPTARG}
 	    ;;
 	d)
 	    d_dir="${OPTARG}"
-	    printf ${OPTARG}
 	    ;;
 	e)
 	    exclude="${OPTARG}"
-	    printf ${OPTARG}
 	    ;;
 	f)
 	    printf "Not implemented yet.\n"
-	    printf ${OPTARG}
 	    ;;
 	h)
 	    printf "There will be help in future.\n"
@@ -98,27 +94,23 @@ while getopts "b:d:e:f:hlm::o:" opt; do
 	    ;;
 	l)
 	    log="${OPTARG}"
-	    printf ${OPTARG}
 	    ;;
 	m)
 	    disc="${OPTARG}"
-	    printf ${OPTARG}
 	    ;;
 	o)
 	    o_opt="${OPTARG}"
-	    printf ${OPTARG}
-	    ;;
-	\?)
-	    printf "Infalid option. Try -h for help"
-	    exit 1
 	    ;;
 	:)
-	    printf "Option -$OPTARG requies an argument."
+	    printf "Option -$OPTARG requies an argument.\n"
+	    exit 1
+	    ;;
+	\?)
+	    printf "Infalid option. Try -h for help.\n"
 	    exit 1
 	    ;;
     esac
 done
-exit 0
 
 #=== Let's start program! ===#
 if [ ${disc:-1} = 1 ]
