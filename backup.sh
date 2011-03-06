@@ -61,6 +61,65 @@ umounts()
     fi
 }
 
+#=== Parse opts ===#
+while getopts "b:d:e:f:hlm::o:" opt; do
+    case $opt in
+	b)
+	    b_dir="${OPTARG}"
+	    printf ${OPTARG}
+	    ;;
+	d)
+	    d_dir="${OPTARG}"
+	    printf ${OPTARG}
+	    ;;
+	e)
+	    exclude="${OPTARG}"
+	    printf ${OPTARG}
+	    ;;
+	f)
+	    printf "Not implemented yet.\n"
+	    printf ${OPTARG}
+	    ;;
+	h)
+	    printf "There will be help in future.\n"
+	    printf "backup.sh is an backup script using rdiff-backup.\n\n"
+	    printf "Options:\n"
+	    printf " -b <dir> - directory to backup\n"
+	    printf " -d <dir> - destination of backup\n"
+	    printf " -e \"<exclude>\" - exclude (see rdiff-backup's man)\n"
+	    printf " -f <file> - configuration file (default /etc/backup.sh.rc and ~/.backup.sh.rc)\n"
+	    printf " -h - this help\n"
+	    printf " -l <dir> - directory to store logs (empty for no logs)\n"
+	    printf " -m <device> - device to mount before doing backup\n"
+	    printf " -o \"<opts>\" - options to rdiff-backup\n\n\n"
+
+	    printf "mariom, 2011\n"
+	    exit 0
+	    ;;
+	l)
+	    log="${OPTARG}"
+	    printf ${OPTARG}
+	    ;;
+	m)
+	    disc="${OPTARG}"
+	    printf ${OPTARG}
+	    ;;
+	o)
+	    o_opt="${OPTARG}"
+	    printf ${OPTARG}
+	    ;;
+	\?)
+	    printf "Infalid option. Try -h for help"
+	    exit 1
+	    ;;
+	:)
+	    printf "Option -$OPTARG requies an argument."
+	    exit 1
+	    ;;
+    esac
+done
+exit 0
+
 #=== Let's start program! ===#
 if [ ${disc:-1} = 1 ]
 then
