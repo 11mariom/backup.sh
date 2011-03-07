@@ -1,16 +1,23 @@
 #!/bin/sh
 #===================#
-# the backup script #
-#      ======       #
+# backup.sh:        #
+#       v1.0        $
+#     ========      #
 #      mariom       #
 #===================#
-#=== conf ===#
-exclude="/home/mario/.wine /home/mario/Torrents /home/mario/.games" # write shell_pattern      ### see man rdiff-backup
-o_opt="--print-statistics" # other options to rdiff-backup  ## man pages
-b_dir="/home/" # directory to backup
-d_dir="/media/backup/" # destination of backup
-log="/root/.backup.log/" # place for log, if empty - no logs will be saved.
-disc="/dev/sdb1" # disc for backup, if empty - no disk will be mounted
+
+# config file (bash.sh.rc.example):
+# default paths where config will be search:
+#  * /etc/bash.sh.rc
+#  * ~/.bash.sh.rc
+#=======================================#
+#=== conf ===#   !!! DEPRECATED !!!
+#exclude="/home/mario/.wine /home/mario/Torrents /home/mario/.games" # write shell_pattern      ### see man rdiff-backup
+#o_opt="--print-statistics" # other options to rdiff-backup  ## man pages
+#b_dir="/home/" # directory to backup
+#d_dir="/media/backup/" # destination of backup
+#log="/root/.backup.log/" # place for log, if empty - no logs will be saved.
+#disc="/dev/sdb1" # disc for backup, if empty - no disk will be mounted
 
 #=== Fancy things ;) ===#
 cols=$(tput cols)
@@ -32,7 +39,24 @@ b="\033[1;34m"
 w="\033[1;39m"
 
 #=== Don't edit below ===#
+if [ -f /etc/backup.sh.rc ]
+then
+    cfg_file="/etc/backup.sh.rc"
+elif [ -f ${HOME}/.backup.sh.rc ]
+then
+    cfg_file="${HOME}/.backup.sh.rc"
+else
+    cfg_file=""
+fi
 #=== Functions ===#
+cfg_parse()
+{
+    for i in exclude o_opt b_dir d_dir log disc
+    do
+	eval $i=\"$( awk -F= "/$i/"'{print "\""$2"\""}' ${cfg_file} )\"
+    done
+}
+
 mounts()
 {
     printf "Mounting ${p}${d_dir}${c}…\n"
@@ -62,11 +86,12 @@ umounts()
 }
 
 #=== Parse opts ===#
-while getopts "b:d:e:f:hlm::o:" opt; do
+while getopts "b:d:e:f:hlm::o:" opt
+do
     case $opt in
 	b)
 	    b_dir="${OPTARG}"
-	    ;;
+       	    ;;
 	d)
 	    d_dir="${OPTARG}"
 	    ;;
@@ -74,7 +99,8 @@ while getopts "b:d:e:f:hlm::o:" opt; do
 	    exclude="${OPTARG}"
 	    ;;
 	f)
-	    printf "Not implemented yet.\n"
+	    cfg_file="${OPTARG}"
+	    cfg_parse
 	    ;;
 	h)
 	    printf "There will be help in future.\n"
@@ -83,7 +109,7 @@ while getopts "b:d:e:f:hlm::o:" opt; do
 	    printf " -b <dir> - directory to backup\n"
 	    printf " -d <dir> - destination of backup\n"
 	    printf " -e \"<exclude>\" - exclude (see rdiff-backup's man)\n"
-	    printf " -f <file> - configuration file (default /etc/backup.sh.rc and ~/.backup.sh.rc)\n"
+	    printf " -f <full_path_to_file> - configuration file (default /etc/backup.sh.rc and ~/.backup.sh.rc)\n"
 	    printf " -h - this help\n"
 	    printf " -l <dir> - directory to store logs (empty for no logs)\n"
 	    printf " -m <device> - device to mount before doing backup\n"
@@ -101,10 +127,6 @@ while getopts "b:d:e:f:hlm::o:" opt; do
 	o)
 	    o_opt="${OPTARG}"
 	    ;;
-	:)
-	    printf "Option -$OPTARG requies an argument.\n"
-	    exit 1
-	    ;;
 	\?)
 	    printf "Infalid option. Try -h for help.\n"
 	    exit 1
@@ -113,6 +135,18 @@ while getopts "b:d:e:f:hlm::o:" opt; do
 done
 
 #=== Let's start program! ===#
+if [ ${b_dir:-1} = 1 ]
+then
+    printf "${r}Directory to backup doesn't specified! Try -h for help.${c}\n"
+    exit 1
+fi
+
+if [ ${d_dir:-1} = 1 ]
+then
+    printf "${r}Destination directory for backup doesn't specified! Try -h for help.${c}\n"
+    exit 1
+fi
+
 if [ ${disc:-1} = 1 ]
 then
     printf "${c}Nothing to mount\n"
@@ -123,14 +157,13 @@ fi
 printf "${r}Starting backup…${c}\n"
 
 if [ ${log:-1} = 1 ]
-
 then
     o_log=""
 else
     o_log="--print-statistics"
 fi
 
-exclude=$(printf ${exclude} | awk '{for (i = 1; i <= NF; i++)\
+exclude=$(echo ${exclude} | awk '{for (i = 1; i <= NF; i++)\
                                printf "--exclude %s ",$i}')
 rdiff-backup ${o_opt} ${o_log} ${exclude} ${b_dir} ${d_dir} >> ${l_file}
 exit_code=$?
