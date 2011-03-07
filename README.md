@@ -22,4 +22,8 @@ Is simply described in the script.
 
 TODO:
 -----
+   * configuration in external file
+   * (safe) parsing config file
+   * ebuild
+
 Any suggestions?
