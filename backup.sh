@@ -86,7 +86,7 @@ umounts()
 }
 
 #=== Parse opts ===#
-while getopts "b:d:e:f:hlm::o:" opt
+while getopts "b:d:e:f:hl:m:o:" opt
 do
     case $opt in
 	b)
@@ -165,7 +165,9 @@ fi
 
 exclude=$(echo ${exclude} | awk '{for (i = 1; i <= NF; i++)\
                                printf "--exclude %s ",$i}')
-rdiff-backup ${o_opt} ${o_log} ${exclude} ${b_dir} ${d_dir} >> ${l_file}
+echo ${exclude}
+exit 0
+#rdiff-backup ${o_opt} ${o_log} ${exclude} ${b_dir} ${d_dir} >> ${l_file}
 exit_code=$?
 
 if [ $exit_code = 0 ]
